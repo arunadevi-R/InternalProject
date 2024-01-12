@@ -1,0 +1,21 @@
+[
+  [
+    {
+      "connection": {
+        "clientId": "HF-db8edcbc84a4d",
+        "name": "aruna",
+        "protocol": "mqtt",
+        "host": "",
+        "port": "",
+        "validateCertificate": false,
+        "encryption": false,
+        "username": "",
+        "password": "",
+        "topics": [],
+        "certificates": {
+          "clientKey": "/home/aruna/package.json"
+        }
+      }
+    }
+  ]
+]

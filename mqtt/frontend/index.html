@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<script src="https://kit.fontawesome.com/ff5eb94862.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/mongodb@5.6.0/lib/operations/count.min.js"></script>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+<title>MQTT</title>
+<style>
+
+::-webkit-scrollbar {
+width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+background-color: #d4d6d8;
+border-radius: 1px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background-color: #718096;
+}
+
+::-webkit-scrollbar-track {
+background-color: #edf2f7;
+}
+
+</style>
+</head>
+<body style="font-family:'Roboto', sans-serif;" class="bg-yellow-50">
+<div>
+<div id="header" class="items-center justify-between px-5 bg-gradient-to-r from-yellow-200 to-orange-300 inline-flex border w-full h-14">
+<div class="flex gap-x-7 items-center relative">
+<button id="plus-button" class=" bg-[#FF9800] hover:from-yellow-600 hover:to-orange-700 rounded-full text-center w-9 h-9">
+<i class="pt-[7px] text-white fa-solid fa-plus"></i>
+</button>
+<p id="drop-down" class="text-xl cursor-pointer " >Connections <i id="drop-down" class=" text-base fa-solid fa-angle-down"></i></p>
+
+</div>
+<p class="text-bold text-2xl text-black">MQTT Connection</p>
+</div>
+<div id="side" class="hidden sidebar">
+<div class=" absolute overflow-auto scrollbar-thin scrollbar-thumb-[#FF9800] scrollbar-track-transparent z-10 mt-2 h-[352px] w-56 text-center bg-gray-50 mx-2 rounded-md shadow-lg ">
+<ul id="connectionList" class="py-2 connectionList">
+
+</ul>
+</div>
+</div>
+<div class="connection-form connection-list-container" id="connectionListContainer" >
+<div class="flex h-[369px]">
+<div class="w-[60%] m-2 my-2 rounded-lg bg-white shadow-lg">
+<div class="my-7 mt-9 space-x-4 text-center">
+<label for="input" class="">
+<input type="text" id="name" name="connection-name" class="py-2 px-2 text-gray-600 placeholder:text-gray-600 w-60 bg-gray-100 border-orange-400 text-sm rounded-lg focus:border-orange-400 outline-none" placeholder="Connection Name" required>
+</label>
+<select name="protocol" id="pro" class="p-2 text-gray-600 w-32 bg-gray-100 text-sm rounded-lg focus:border-orange-400 outline-none" id="dropdown" name="dropdown" aria-placeholder="Protocol" required>
+<option value="mqtt">mqtt://</option>
+<option value="ws">ws://</option>
+</select>
+</div>
+<div class="my-4 space-x-4 text-center">
+<label for="input" class="">
+<input type="text" id="host" name="host" class="py-2 px-2 text-gray-600 placeholder:text-gray-600 w-60 bg-gray-100 border-1 border-orange-400 text-sm rounded-lg focus:border-orange-400 outline-none" placeholder="Host" required>
+</label>
+<label for="inp" class="">
+<input name="port" type="text" id="port" class="py-2 px-2 text-gray-600 placeholder:text-gray-600 w-32 bg-gray-100 border-gray-400 text-sm rounded-lg focus:border-gray-500 outline-none" placeholder="Port" required pattern="[0-9]*" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+</label>
+</div>
+<div class="justify-center flex">
+<div class="flex my-3">
+<p class=" text-gray-500 text-md" for="vehicle1"> Validate Certificate</p>
+<label class="relative ml-5 inline-flex items-center cursor-pointer">
+<input type="checkbox" id="cert" name="validate-cert" value="" class="sr-only peer">
+<div class="w-[34px] h-[18px] bg-gray-200 peer-focus:outline-none peer-focus:ring-gray-300 dark:peer-focus:ring-gray-600 rounded-full peer-dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-gray-700"></div> </label>
+
+
+</div>
+<div class="flex my-3">
+<p class="ml-8 text-gray-500 text-md" for="vehicle1">Encryption(tls)</p>
+<label class="relative ml-5 inline-flex items-center cursor-pointer">
+<input type="checkbox" id="encrypt" name="encrypt" value="" class="sr-only peer">
+<div class="w-[34px] h-[18px] bg-gray-200 peer-focus:outline-none peer-focus:ring-gray-300 dark:peer-focus:ring-gray-600 rounded-full peer-dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-gray-700"></div> </label>
+
+</div>
+</div>
+<div class="my-3 justify-center flex ">
+<label for="inp" class="">
+<input type="text" name="user" id="user" class="py-2 px-2 w-[190px] placeholder:text-gray-600 bg-gray-100 border-gray-400 text-sm rounded-lg focus:border-gray-500 outline-none" placeholder="Username" required>
+</label>
+<div class="relative ml-3">
+<input type="password" id="passw" name="pass" class="w-[190px] px-2 py-2 rounded-lg placeholder:text-gray-600 bg-gray-100 border-gray-400 text-sm focus:border-gray-500 focus:outline-none" placeholder="Password" required id="password">
+<div class="absolute inset-y-0 right-0 flex items-center pr-3">
+<button type="button" id="togglePassword" class="p-2">
+<i id="passwordIcon" class="far fa-eye-slash text-gray-500"></i>
+</button>
+</div>
+</div>
+</div>
+<div class="flex mt-8 justify-center">
+<button id="save-btn" class="save text-white h-9 w-40 ml-2 focus:ease-in focus:duration-300 bg-[#FF9800] hover:bg-orange-400 focus:outline-none font-medium rounded-lg text-center items-center mr-2 mb-2">
+<i class="pr-2 fa-solid fa-floppy-disk"></i>Save
+</button>
+<div>
+<button id="connect-btn" class="connect text-white w-40 h-9 ml-2 bg-[#FF9800] hover:bg-orange-400 focus:py-[9px] focus:px-[17px] focus:outline-none font-medium rounded-lg text-center items-center mr-2 mb-2">
+<i class="fa-solid fa-power-off pr-2"></i> Connect
+</button>
+</div>
+</div>
+
+</div>
+<div class="w-[40%] m-2 ml-0 rounded-lg shadow-lg my-2 bg-white ">
+<h1 class="text-md text-center mt-2 mb-2 text-gray-700">Advanced</h1>
+<div class="box-border border-0 w-64 h-40 bg-gray-200 shadow-md mx-auto">
+<div class="flex">
+<label for="inp" class="">
+<input type="text" id="topic-input" name="sub" class="py-[6px] px-2 text-gray-600 border-b-2 w-[225px] bg-gray-100 border-gray-400 text-sm focus:border-gray-500 outline-none" placeholder="Topics to Subscribe">
+</label>
+<button type="submit" onclick="addTopic()" class="btn-list cursor-pointer border-none py-[3px] px-[10px] text-sm text-center bg-[#FF9800]"><i class="fa-solid fa-plus text-white"></i></button>
+</div>
+<div class="container overflow-y-auto mx-auto w-full mb-3 -mt-1 h-32">
+<ul id="topics-list" class="list-none px-3 text-gray-600 leading-6 py-3 text-sm">
+<li class="">Sub<i class="float-right text-xs text-[#FF9800] fa-solid fa-trash"></i></li>
+</ul>
+</div>
+</div>
+<div class="text-center">
+  <label for="inp" class="">
+     <input type="text" id="clientId" class="py-2 px-2 my-3 border-b-2 hover:border-b-3 w-60  border-gray-400 text-sm  focus:border-gray-600 outline-none" placeholder="MQTT Client ID">
+ </label>
+  </div>
+<div class=" my-1 relative">
+<div class="text-center">
+<button id="certificateButton" class=" w-44 h-9 mt-3 text-white focus:bg-[#FF9800] focus:ring-0 focus:ring-slate-300 bg-[#FF9800] rounded-lg" onclick="toggleBox()">
+<i class="fas fa-award mr-2"></i> Certificates
+</button>
+
+<div id="myBox" class="hidden absolute -top-[255px] ml-4 text-center h-[260px] w-[260px] bg-gray-50 rounded-lg shadow-lg ">
+<div class="">
+<button class="px-4 py-[6px] mt-7 text-center rounded-lg mx-auto bg-orange-300 text-gray-700 focus:bg-orange-400 focus:text-gray-100"
+onclick="document.getElementById('certificate-file1').click()">
+
+<i class="fas fa-medal mr-2"></i>Server Certificate(CA)
+</button>
+<input type="file" id="certificate-file1"  class="hidden" onchange="updateFileName('file-name1', 'certificate-file1', 'delete-icon1')" />
+<div class="flex text-sm items-center justify-center mt-2">
+<div id="file-name1" class="text-gray-400"></div>
+<i id="delete-icon1" class="hidden float-right ml-2 text-sm cursor-pointer fa-solid fa-xmark text-gray-400" onclick="deleteFile('file-name1', 'certificate-file1', 'delete-icon1')"></i>
+</div>
+</div>
+
+<button class="px-4 py-[6px] mt-5 text-center rounded-lg mx-auto bg-orange-300 text-gray-700 focus:bg-orange-400 focus:text-gray-100"
+onclick="document.getElementById('certificate-file2').click()">
+<i class="fas fa-medal mr-2"></i> Client Certificate
+</button>
+<input type="file" id="certificate-file2"  class="hidden" onchange="updateFileName('file-name2', 'certificate-file2', 'delete-icon2')" />
+<div class="flex items-center justify-center text-sm mt-2">
+<div id="file-name2" class="text-gray-400"></div>
+<i id="delete-icon2" class="hidden cursor-pointer text-sm ml-2 fa-solid fa-xmark text-gray-400" onclick="deleteFile('file-name2', 'certificate-file2', 'delete-icon2')"></i>
+</div>
+
+<button class="px-4 py-[6px] mt-5 text-center rounded-lg mx-auto bg-orange-300 text-gray-700 focus:bg-orange-400 focus:text-gray-100"
+onclick="document.getElementById('certificate-file3').click()">
+<i class="fas fa-medal mr-2"></i>Client Key
+</button>
+<input type="file" id="certificate-file3"  class="hidden" onchange="updateFileName('file-name3', 'certificate-file3', 'delete-icon3')" />
+<div class="flex items-center justify-center text-sm mt-2">
+<div id="file-name3" class="text-gray-400"></div>
+<i id="delete-icon3" class="hidden
+cursor-pointer fa-solid fa-xmark text-sm text-gray-400 ml-2" onclick="deleteFile('file-name3', 'certificate-file3', 'delete-icon3')"></i>
+</div>
+
+</div>
+
+</div>
+
+
+</div>
+</div>
+</div>
+</div>
+
+<script src="renderer.js" ></script>
+
+</body>
+</html>
+
