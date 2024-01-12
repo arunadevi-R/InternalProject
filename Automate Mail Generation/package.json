@@ -1,0 +1,11 @@
+{
+    "name": "birthday_email_automation",
+    "version": "1.0.0",
+    "description": "Automation script for sending birthday emails to employees",
+    "main": "index.js",
+    "dependencies": {
+        "node-cron": "^3.0.2",
+        "node-schedule": "^2.1.1",
+        "nodemailer": "^6.9.4"
+    }
+}
